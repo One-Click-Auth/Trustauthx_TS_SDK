@@ -1,5 +1,5 @@
 {
-  "name": "trustauthx-client",
+  "name": "trustauthx",
   "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
