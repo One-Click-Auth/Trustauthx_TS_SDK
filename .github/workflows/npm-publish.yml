@@ -20,7 +20,9 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
-      # - run: npm test
+      - run: npm run build:types
+      - run: npm run build      
+    # - run: npm test
 
   publish-npm:
     needs: build
