@@ -22,7 +22,7 @@ export class AuthLiteClient {
   }
 
   private jwtEncode(key: string, data: object): string {
-    return sign(data, key, { algorithm: "HS256" });
+    return sign(data, key, { algorithm: "HS256", noTimestamp: true });
   }
 
   private jwtDecode(token: string, secret: string): any {
