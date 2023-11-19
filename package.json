@@ -1,13 +1,13 @@
 {
   "name": "trustauthx",
-  "version": "1.0.2",
+  "version": "1.0.21",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc src/index.ts --format cjs,esm --dts",
-    "build:types": "tsc src/index.ts --emitDeclarationOnly",
+    "build": "tsc src/index.ts --module commonjs --target esnext --declaration true --declarationMap true --outDir dist",
+    "build:types": "tsc src/index.ts --emitDeclarationOnly --declaration true --declarationMap true",
     "lint": "tsc"
   },
   "author": "",
