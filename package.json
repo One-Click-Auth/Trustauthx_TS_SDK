@@ -1,6 +1,6 @@
 {
   "name": "trustauthx",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -19,5 +19,5 @@
   "dependencies": {
     "jsonwebtoken": "^9.0.2"
   },
-  "files": ["src/**/*", "dist/**/*"]
+  "files": ["*"]
 }
