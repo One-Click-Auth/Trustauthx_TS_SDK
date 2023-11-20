@@ -29,14 +29,13 @@ export class AuthLiteClient {
     return verify(token, secret, { algorithms: ["HS256"] });
   }
 
-  generateUrl(): string {
-    if (this.orgId) {
-      return `https://app.trustauthx.com/widget/login/?org_id=${this.orgId} 
-              click the above link`;
-    } else {
-      throw new Error("Must provide org_id");
-    }
-  }
+  generateUrl(subDomain?: string): string {
+  if (this.orgId)
+    return `https://${
+      subDomain ? `${subDomain}.` : ""
+    }app.trustauthx.com/widget/login/?org_id=${this.orgId}`;
+  else throw new Error("Must provide org_id");
+}
 
   async generateEditUserUrl(accessToken: string, url: string): Promise<string> {
     const headers = { accept: "application/json" };
