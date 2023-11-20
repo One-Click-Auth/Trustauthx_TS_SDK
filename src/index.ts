@@ -103,7 +103,7 @@ export class AuthLiteClient {
 
         // Object.key(object).length === 0
         // const rtn = this.jwtDecode(this.secretKey, JSON.stringify(data));
-        const decodeValue = this.jwtDecode(
+        const decodeValue = this.decode(
           JSON.stringify(data),
           this.secretKey
         );
@@ -144,7 +144,7 @@ export class AuthLiteClient {
 
       if (response.status === 200) {
         const data = await response.json();
-        const decodeValue = this.jwtDecode(
+        const decodeValue = this.decode(
           this.secretKey,
           JSON.stringify(data)
         );
