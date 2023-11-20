@@ -26,7 +26,7 @@ export class AuthLiteClient {
   }
 
   private jwtDecode(token: string, secret: string): any {
-    return decode(token});
+    return decode(token);
   }
 
   generateUrl(subDomain?: string): string {
