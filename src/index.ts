@@ -1,4 +1,4 @@
-import { sign, verify } from "jsonwebtoken";
+import { sign, verify, decode } from "jsonwebtoken";
 
 import { makeRequest } from "./utils";
 
@@ -26,7 +26,7 @@ export class AuthLiteClient {
   }
 
   private jwtDecode(token: string, secret: string): any {
-    return verify(token, secret, { algorithms: ["HS256"] });
+    return decode(token, secret, { algorithms: ["HS256"] });
   }
 
   generateUrl(subDomain?: string): string {
@@ -103,7 +103,7 @@ export class AuthLiteClient {
 
         // Object.key(object).length === 0
         // const rtn = this.jwtDecode(this.secretKey, JSON.stringify(data));
-        const decodeValue = this.decode(
+        const decodeValue = this.jwtDecode(
           JSON.stringify(data),
           this.secretKey
         );
@@ -144,7 +144,7 @@ export class AuthLiteClient {
 
       if (response.status === 200) {
         const data = await response.json();
-        const decodeValue = this.decode(
+        const decodeValue = this.jwtDecode(
           this.secretKey,
           JSON.stringify(data)
         );
