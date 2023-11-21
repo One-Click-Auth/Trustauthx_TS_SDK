@@ -108,13 +108,12 @@ export class AuthLiteClient {
           this.secretKey
         );
         // TODO Red swiggly
-        const sub = JSON.parse(decodeValue.sub);
-        // delete rtn["sub"];
-        // rtn["email"] = sub["email"];
-        // rtn["uid"] = sub["uid"];
-        // return rtn;
+        const sub = rtn["sub"];
+        delete rtn["sub"];
+        rtn["email"] = sub["email"];
+        rtn["uid"] = sub["uid"];
         // TODO Red swiggly
-        return { email: sub.email, uid: sub.uid };
+        return {rtn};
       } else {
         throw new Error(
           `Request failed with status code: ${
