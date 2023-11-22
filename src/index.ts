@@ -25,7 +25,7 @@ export class AuthLiteClient {
     return sign(data, key, { algorithm: "HS256", noTimestamp: true });
   }
 
-  private jwtDecode(token: string, secret: string): any {
+  private jwtDecode(token: string): any {
     return decode(token);
   }
 
@@ -99,7 +99,7 @@ export class AuthLiteClient {
         //     }
         //   }
 
-        const decoded = this.jwtDecode(this.secretKey, JSON.stringify(data));
+        const decoded = this.jwtDecode(JSON.stringify(data));
 
         return { email: decoded.email, uid: decoded.uid };
       } else {
@@ -131,15 +131,11 @@ export class AuthLiteClient {
 
       if (response.status === 200) {
         const data = await response.json();
-        const decodeValue = this.jwtDecode(
-          this.secretKey,
-          JSON.stringify(data)
-        );
-        const sub = JSON.parse(decodeValue["sub"]);
-        // delete rtn["sub"];
-        // rtn["email"] = sub["email"];
-        // rtn["uid"] = sub["uid"];
-        return { email: sub.email, uid: sub.uid };
+
+        const decoded = this.jwtDecode(data);
+        const subDecoded = JSON.parse(decoded["sub"]);
+
+        return { email: subDecoded.email, uid: subDecoded.uid };
       } else {
         throw new Error(
           `Request failed with status code: ${
