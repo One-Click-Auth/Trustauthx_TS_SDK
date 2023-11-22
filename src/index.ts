@@ -133,9 +133,10 @@ export class AuthLiteClient {
         const data = await response.json();
 
         const decoded = this.jwtDecode(data);
-        const subDecoded = JSON.parse(decoded["sub"]);
+        const decodedSub = JSON.parse(decoded["sub"]);
+        delete decoded["sub"];
 
-        return { email: subDecoded.email, uid: subDecoded.uid };
+        return { ...decoded, ...decodedSub };
       } else {
         throw new Error(
           `Request failed with status code: ${
