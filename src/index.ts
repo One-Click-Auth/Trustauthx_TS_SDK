@@ -1,4 +1,4 @@
-import { sign, verify, decode } from "jsonwebtoken";
+import { decode, sign } from "jsonwebtoken";
 
 import { makeRequest } from "./utils";
 
@@ -30,12 +30,12 @@ export class AuthLiteClient {
   }
 
   generateUrl(subDomain?: string): string {
-  if (this.orgId)
-    return `https://${
-      subDomain ? `${subDomain}.` : ""
-    }app.trustauthx.com/widget/login/?org_id=${this.orgId}`;
-  else throw new Error("Must provide org_id");
-}
+    if (this.orgId)
+      return `https://${
+        subDomain ? `${subDomain}.` : ""
+      }app.trustauthx.com/widget/login/?org_id=${this.orgId}`;
+    else throw new Error("Must provide org_id");
+  }
 
   async generateEditUserUrl(accessToken: string, url: string): Promise<string> {
     const headers = { accept: "application/json" };
@@ -98,22 +98,10 @@ export class AuthLiteClient {
         //       "uid": "9cfd948699284f5da7b21c2a22df34e0aa441c259e47509b972f8cc6a7f38dcd"
         //     }
         //   }
-        // TODO change the below implementation
-        // const decodedData = this.jw
 
-        // Object.key(object).length === 0
-        const rtn = this.jwtDecode(this.secretKey, JSON.stringify(data));
-        const decodeValue = this.jwtDecode(
-          JSON.stringify(data),
-          this.secretKey
-        );
-        // TODO Red swiggly
-        const sub = rtn["sub"];
-        delete rtn["sub"];
-        rtn["email"] = sub["email"];
-        rtn["uid"] = sub["uid"];
-        // TODO Red swiggly
-        return {rtn};
+        const decoded = this.jwtDecode(this.secretKey, JSON.stringify(data));
+
+        return { email: decoded.email, uid: decoded.uid };
       } else {
         throw new Error(
           `Request failed with status code: ${
