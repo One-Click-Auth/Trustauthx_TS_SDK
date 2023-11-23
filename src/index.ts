@@ -53,8 +53,7 @@ export class AuthLiteClient {
     else throw new Error("Must provide org_id");
   }
 
-  async generateEditUserUrl(accessToken: string, url: string): Promise<string> {
-    const headers = { accept: "application/json" };
+  generateEditUserUrl(accessToken: string, url: string): string {
     const params = new URLSearchParams({
       AccessToken: accessToken,
       api_key: this.apiKey,
@@ -62,19 +61,7 @@ export class AuthLiteClient {
       url: url,
     });
 
-    const apiResult = await makeRequest(
-      "https://api.trustauthx.com/api/user/me/settings/?" + params.toString(),
-      { headers }
-    );
-    // return fetch('https://api.trustauthx.com/api/user/me/settings/?' + params.toString(), {
-    //     method: 'GET',
-    //     headers: headers,
-    // }).then((response) => {
-    //     return response.url;
-    // });
-    return apiResult.url!;
-    // DONE need to retun the url got from apiResult and also need to give the generics to the makeRequest function
-    // DONE fix the return type as well
+    return `https://api.trustauthx.com/api/user/me/settings/?${params.toString()}`;
   }
 
   async reAuth(code: string): Promise<{ email: string; uid: string }> {
