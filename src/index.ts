@@ -8,6 +8,22 @@ interface TokenCheck {
   state: boolean;
 }
 
+type GetUser = {
+  iss: string;
+  jti: string;
+  access_token: string;
+  type: string;
+  exp: number;
+  refresh_Token: string;
+  refreshExp: number;
+  scope: string;
+  img: string;
+  name: string;
+  iat: number;
+  uid: string;
+  email: string;
+};
+
 export class AuthLiteClient {
   private secretKey: string;
   private apiKey: string;
@@ -81,23 +97,6 @@ export class AuthLiteClient {
 
       if (response.status === 200) {
         const data = await response.json();
-        // {
-        //     "user": {
-        //       "iss": "https://api.trustauthx.com/",
-        //       "jti": "a5c65395fd3041cc81900d658d05ef9c",
-        //       "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiXCJnQUFBQUFCbEN5QXpVU2NGLThBUkJ1ZHF0a0Z5SlBld2hVUnFDVmRyQzNjb3VUOGZhcHNuNTY0VW9jNGVnYnhMd1RnU0RR",
-        //       "type": "Bearer",
-        //       "exp": 1695443955.56166,
-        //       "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjoiXCJnQUFBQUFCbEN5QXpna1VIYmRxZjVRZFRpa1hKZlZvaTlldUNrQXBsdTlpS0pBTGlyVmFlUGtKSmRUUjRJeE0yQngteXg4TVBaCOrVoJG00sp3uylf8hIKshYyR8",
-        //       "refresh_exp": 604800,
-        //       "scope": "read",
-        //       "img": "https://avatars.githubusercontent.com/u/68702919?v=4",
-        //       "name": "moonlightnexus-",
-        //       "iat": 1695227955,
-        //       "email": "moonlightnexus@yahoo.com",
-        //       "uid": "9cfd948699284f5da7b21c2a22df34e0aa441c259e47509b972f8cc6a7f38dcd"
-        //     }
-        //   }
 
         const decoded = this.jwtDecode(JSON.stringify(data));
 
@@ -114,7 +113,7 @@ export class AuthLiteClient {
     }
   }
 
-  async getUser(token: string): Promise<object> {
+  async getUser(token: string): Promise<GetUser> {
     const url = "https://api.trustauthx.com/api/user/me/auth/data";
     const params = new URLSearchParams({
       UserToken: token,
