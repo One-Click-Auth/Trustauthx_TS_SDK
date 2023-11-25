@@ -74,10 +74,6 @@ export class AuthLiteClient {
     const headers = { accept: "application/json" };
 
     try {
-      //   const response = await fetch(url + "?" + params.toString(), {
-      //     method: "GET",
-      //     headers: headers,
-      //   });
       const response = await makeRequest(url + "?" + params.toString(), {
         headers,
       });
@@ -186,24 +182,23 @@ export class AuthLiteClient {
   }
 
   async revokeToken(
-    AccessToken: string | null = null,
-    RefreshToken: string | null = null,
+    accessToken: string,
+    refreshToken: string | null = null,
     revokeAllTokens: boolean = false
   ): Promise<boolean> {
     const url = "https://api.trustauthx.com/api/user/me/token/";
     const headers = { accept: "application/json" };
 
-    if (!AccessToken && !RefreshToken) {
+    if (!accessToken)
       throw new Error("Must provide either AccessToken or RefreshToken");
-    }
 
-    const tt = !!AccessToken;
-    const t = AccessToken ?? RefreshToken;
+    const isAccessToken = !!accessToken;
+    const t = accessToken ?? refreshToken;
     const params = new URLSearchParams({
-      Token: t!, //Todo can i add ! to t
+      Token: t!,
       api_key: this.apiKey,
       signed_key: this.signedKey,
-      AccessToken: tt.toString(),
+      AccessToken: isAccessToken.toString(),
       SpecificTokenOnly: (!revokeAllTokens).toString(),
     });
 
