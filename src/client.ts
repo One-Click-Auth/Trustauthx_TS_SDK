@@ -13,7 +13,9 @@ const token =
 const test = async () => {
   const auth = new AuthLiteClient(apiKey, secretKey, orgId);
   const user = await auth.getUser(token);
-  console.log({ user });
+
+  const uiol = await auth.getUserFromToken(user.access_token);
+  console.log({ user: uiol });
 };
 
 test();

@@ -214,6 +214,48 @@ export class AuthLiteClient {
     }
   }
 
+  async getUserFromToken(accessToken: string): Promise<{
+    uid: string;
+    email: string;
+    img: string;
+  }> {
+    const url = "https://api.trustauthx.com/api/user/me/data";
+    const params = new URLSearchParams({
+      api_key: this.apiKey,
+      signed_key: this.signedKey,
+      AccessToken: accessToken,
+    });
+    const headers = { accept: "application/json" };
+
+    try {
+      const response = await fetch(url + "?" + params.toString(), {
+        method: "GET",
+        headers: headers,
+      });
+
+      if (response.status === 200) {
+        const data = await response.text();
+        const processedData = data.slice(1, -1);
+
+        const decoded = this.jwtDecode(processedData);
+
+        return {
+          uid: decoded?.uid,
+          email: decoded?.email,
+          img: decoded?.img,
+        };
+      } else {
+        throw new Error(
+          `Request failed with status code: ${
+            response.status
+          }\n${await response.text()}`
+        );
+      }
+    } catch (error) {
+      throw new Error(`Request failed: ${error}`);
+    }
+  }
+
   async validateTokenSet(
     access_token: string,
     refresh_token: string
