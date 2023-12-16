@@ -5,7 +5,11 @@ import {json} from "node:stream/consumers";
 async function checkStatus() {
 
     const access_token = cookies().get("access_token")?.value;
-    // @ts-ignore
+    
+    if (!access_token) {
+        return false;
+    }
+
     const validateToken = await AuthClient.validateAccessToken(access_token);
     return validateToken
 }

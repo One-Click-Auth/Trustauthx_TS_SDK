@@ -6,8 +6,12 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const queryParams = new URLSearchParams(url.search);
 
-    // @ts-ignore
-    const token : string   = queryParams.get('code');
+    
+    const token   = queryParams.get('code');
+
+    if (!token) {
+      return new Response('Missing token', {status: 400});
+    }
 
 
     try {

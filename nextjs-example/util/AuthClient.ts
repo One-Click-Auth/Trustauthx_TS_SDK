@@ -1,12 +1,15 @@
-import {AuthLiteClient} from "../../src";
+import { AuthLiteClient } from '../../src';
 
+const apiKey = process.env.API_KEY;
+const API_SECRET = process.env.API_SECRET;
+const orgId = process.env.ORG_ID;
 
-// @ts-ignore
-const apiKey: string = process.env.API_KEY;
-// @ts-ignore
-const API_SECRET: string = process.env.API_SECRET;
-// @ts-ignore
-const orgId: string = process.env.ORG_ID;
+if (!apiKey || !API_SECRET || !orgId) {
+  throw new Error(
+    'Required environment variables are not set: API_KEY, API_SECRET, ORG_ID',
+  );
+}
+
 const authClient = new AuthLiteClient(apiKey, API_SECRET, orgId);
 
 export default authClient;
