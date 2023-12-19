@@ -2,12 +2,43 @@
   "name": "trustauthx",
   "version": "1.0.37",
   "description": "",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "./dist/node/cjs/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist/**/package.json",
+    "dist/**/*.js",
+    "dist/types/**/*.d.ts"
+  ],
+  "imports": {
+    "#dist": {
+      "import": "./dist/node/esm/index.js",
+      "require": "./dist/node/cjs/index.js"
+    },
+    "#dist/*": {
+      "import": "./dist/node/esm/*.js",
+      "require": "./dist/node/cjs/*.js"
+    }
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/node/esm/index.js",
+      "require": "./dist/node/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "build": "tsc src/index.ts --module commonjs --target esnext --declaration true --declarationMap true --outDir dist",
-    "build:types": "tsc src/index.ts --emitDeclarationOnly --declaration true --declarationMap true",
+    "build": "tsc",
+    "build-all": "run-s clear build:*",
+    "build:node-cjs": "run-s runtime-node 'build -- -p ./tsconfig/node-cjs.json'",
+    "build:node-esm": "run-s runtime-node 'build -- -p ./tsconfig/node-esm.json' && echo '{\"type\": \"module\"}'> dist/node/esm/package.json",
+    "build:types": "npm run-script build -- -p ./tsconfig/types.json && cd src && find . -name '*.d.ts' -maxdepth 2 -type f -exec rsync -R \"{}\" ../dist/types  \\; && cd .. && run-s -s types:find | xargs -0 sed -i.bak -e \"s/\\.js'/'/g\" -e \"s/\\.d'/'/g\" && npm run-script sedcleanup",
+    "runtime-node": "run-s runtime:clear runtime:refs",
+    "runtime:clear": "run-s -s runtime:find | xargs -0 rm -f",
+    "runtime:find": "find src/runtime -not -name '*.d.ts' -maxdepth 1 -type f -print0",
+    "runtime:refs": "run-s -s runtime:find | xargs -0 sed -i.bak -e \"s/'\\.\\.\\//'\\.\\//g\" -e \"s/'\\.\\/\\.\\./'../g\" && npm run-script sedcleanup",
+    "clear": "rm -Rf dist",
+    "sedcleanup": "find . -name '*.bak' -type f -print0 | xargs -0 rm -f",
     "lint": "tsc",
     "start": "tsc && nodemon dist/client.js"
   },
@@ -15,6 +46,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.3",
+    "npm-run-all2": "^6.1.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
