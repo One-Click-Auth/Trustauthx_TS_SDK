@@ -29,7 +29,8 @@ export class AuthLiteClient {
   private secretKey: string;
   private apiKey: string;
   private orgId?: string;
-  private signedKey: string;
+  // INFO: using `!` ensuring that signedKey will be assigned before it is used and to suppress the TypeScript error
+  private signedKey!: string;
 
   constructor(apiKey: string, secretKey: string, orgId?: string) {
     this.secretKey = secretKey;
