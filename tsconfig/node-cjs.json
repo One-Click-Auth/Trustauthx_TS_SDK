@@ -1,0 +1,9 @@
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "target": "ES2022",
+    "module": "CommonJS",
+    "outDir": "../dist/node/cjs"
+  }
+}
