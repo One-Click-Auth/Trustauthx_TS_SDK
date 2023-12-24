@@ -1,0 +1,23 @@
+{
+  "name": "trustauthx-cli",
+  "version": "1.0.0",
+  "description": "CLI tool for creating trustauthx sdk examples",
+  "main": "dist/index.js",
+  "bin": {
+    "create-trustauthx-sdk": "./dist/index.js"
+  },
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "files": ["dist", "Templates"],
+  "author": "vikash choudhary",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "trustauthx": "^1.0.37",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5"
+  }
+}
