@@ -1,28 +1,7 @@
-import { decode, sign } from "jsonwebtoken";
+import { decode, sign } from 'jsonwebtoken';
 
-import { makeRequest } from "./utils";
-
-interface TokenCheck {
-  access: string;
-  refresh: string;
-  state: boolean;
-}
-
-type GetUser = {
-  iss: string;
-  jti: string;
-  access_token: string;
-  type: string;
-  exp: number;
-  refresh_Token: string;
-  refreshExp: number;
-  scope: string;
-  img: string;
-  name: string;
-  iat: number;
-  uid: string;
-  email: string;
-};
+import { makeRequest } from './utils';
+import { GetUser, TokenCheck } from './types';
 
 export class AuthLiteClient {
   private secretKey: string;
@@ -38,7 +17,7 @@ export class AuthLiteClient {
   }
 
   private jwtEncode(key: string, data: object): string {
-    return sign(data, key, { algorithm: "HS256", noTimestamp: true });
+    return sign(data, key, { algorithm: 'HS256', noTimestamp: true });
   }
 
   private jwtDecode(token: string): any {
@@ -48,9 +27,9 @@ export class AuthLiteClient {
   generateUrl(subDomain?: string): string {
     if (this.orgId)
       return `https://${
-        subDomain ? `${subDomain}.` : ""
+        subDomain ? `${subDomain}.` : ''
       }app.trustauthx.com/widget/login/?org_id=${this.orgId}`;
-    else throw new Error("Must provide org_id");
+    else throw new Error('Must provide org_id');
   }
 
   generateEditUserUrl(accessToken: string, url: string): string {
@@ -65,16 +44,16 @@ export class AuthLiteClient {
   }
 
   async reAuth(code: string): Promise<{ email: string; uid: string }> {
-    const url = "https://api.trustauthx.com/api/user/me/widget/re-auth/token";
+    const url = 'https://api.trustauthx.com/api/user/me/widget/re-auth/token';
     const params = new URLSearchParams({
       code: code,
       api_key: this.apiKey,
       signed_key: this.signedKey,
     });
-    const headers = { accept: "application/json" };
+    const headers = { accept: 'application/json' };
 
     try {
-      const response = await makeRequest(url + "?" + params.toString(), {
+      const response = await makeRequest(url + '?' + params.toString(), {
         headers,
       });
 
@@ -88,7 +67,7 @@ export class AuthLiteClient {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`
+          }\n${await response.text()}`,
         );
       }
     } catch (error) {
@@ -97,17 +76,17 @@ export class AuthLiteClient {
   }
 
   async getUser(token: string): Promise<GetUser> {
-    const url = "https://api.trustauthx.com/api/user/me/auth/data";
+    const url = 'https://api.trustauthx.com/api/user/me/auth/data';
     const params = new URLSearchParams({
       UserToken: token,
       api_key: this.apiKey,
       signed_key: this.signedKey,
     });
-    const headers = { accept: "application/json" };
+    const headers = { accept: 'application/json' };
 
     try {
-      const response = await fetch(url + "?" + params.toString(), {
-        method: "GET",
+      const response = await fetch(url + '?' + params.toString(), {
+        method: 'GET',
         headers: headers,
       });
 
@@ -115,15 +94,15 @@ export class AuthLiteClient {
         const data = await response.json();
 
         const decoded = this.jwtDecode(data);
-        const decodedSub = JSON.parse(decoded["sub"]);
-        delete decoded["sub"];
+        const decodedSub = JSON.parse(decoded['sub']);
+        delete decoded['sub'];
 
         return { ...decoded, ...decodedSub };
       } else {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`
+          }\n${await response.text()}`,
         );
       }
     } catch (error) {
@@ -132,17 +111,17 @@ export class AuthLiteClient {
   }
 
   async getAccessTokenFromRefreshToken(refreshToken: string): Promise<any> {
-    const url = "https://api.trustauthx.com/api/user/me/access/token/";
+    const url = 'https://api.trustauthx.com/api/user/me/access/token/';
     const params = new URLSearchParams({
       RefreshToken: refreshToken,
       api_key: this.apiKey,
       signed_key: this.signedKey,
     });
-    const headers = { accept: "application/json" };
+    const headers = { accept: 'application/json' };
 
     try {
-      const response = await fetch(url + "?" + params.toString(), {
-        method: "GET",
+      const response = await fetch(url + '?' + params.toString(), {
+        method: 'GET',
         headers: headers,
       });
 
@@ -152,7 +131,7 @@ export class AuthLiteClient {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`
+          }\n${await response.text()}`,
         );
       }
     } catch (error: any) {
@@ -161,17 +140,17 @@ export class AuthLiteClient {
   }
 
   async validateAccessToken(access_token: string): Promise<boolean> {
-    const url = "https://api.trustauthx.com/api/user/me/auth/validate/token";
+    const url = 'https://api.trustauthx.com/api/user/me/auth/validate/token';
     const params = new URLSearchParams({
       AccessToken: access_token,
       api_key: this.apiKey,
       signed_key: this.signedKey,
     });
-    const headers = { accept: "application/json" };
+    const headers = { accept: 'application/json' };
 
     try {
-      const response = await fetch(url + "?" + params.toString(), {
-        method: "GET",
+      const response = await fetch(url + '?' + params.toString(), {
+        method: 'GET',
         headers: headers,
       });
 
@@ -184,13 +163,13 @@ export class AuthLiteClient {
   async revokeToken(
     accessToken: string,
     refreshToken: string | null = null,
-    revokeAllTokens: boolean = false
+    revokeAllTokens: boolean = false,
   ): Promise<boolean> {
-    const url = "https://api.trustauthx.com/api/user/me/token/";
-    const headers = { accept: "application/json" };
+    const url = 'https://api.trustauthx.com/api/user/me/token/';
+    const headers = { accept: 'application/json' };
 
     if (!accessToken)
-      throw new Error("Must provide either AccessToken or RefreshToken");
+      throw new Error('Must provide either AccessToken or RefreshToken');
 
     const isAccessToken = !!accessToken;
     const t = accessToken ?? refreshToken;
@@ -203,8 +182,8 @@ export class AuthLiteClient {
     });
 
     try {
-      const response = await fetch(url + "?" + params.toString(), {
-        method: "DELETE",
+      const response = await fetch(url + '?' + params.toString(), {
+        method: 'DELETE',
         headers: headers,
       });
 
@@ -219,17 +198,17 @@ export class AuthLiteClient {
     email: string;
     img: string;
   }> {
-    const url = "https://api.trustauthx.com/api/user/me/data";
+    const url = 'https://api.trustauthx.com/api/user/me/data';
     const params = new URLSearchParams({
       api_key: this.apiKey,
       signed_key: this.signedKey,
       AccessToken: accessToken,
     });
-    const headers = { accept: "application/json" };
+    const headers = { accept: 'application/json' };
 
     try {
-      const response = await fetch(url + "?" + params.toString(), {
-        method: "GET",
+      const response = await fetch(url + '?' + params.toString(), {
+        method: 'GET',
         headers: headers,
       });
 
@@ -248,7 +227,7 @@ export class AuthLiteClient {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`
+          }\n${await response.text()}`,
         );
       }
     } catch (error) {
@@ -258,23 +237,23 @@ export class AuthLiteClient {
 
   async validateTokenSet(
     access_token: string,
-    refresh_token: string
+    refresh_token: string,
   ): Promise<TokenCheck> {
     try {
       const d: TokenCheck = {
-        access: "",
-        refresh: "",
+        access: '',
+        refresh: '',
         state: false,
       };
       const is_valid = await this.validateAccessToken(access_token);
       if (!is_valid) {
         if (refresh_token) {
           const new_tokens = await this.getAccessTokenFromRefreshToken(
-            refresh_token
+            refresh_token,
           );
           d.state = false;
-          d.access = new_tokens["access_token"];
-          d.refresh = new_tokens["refresh_token"];
+          d.access = new_tokens['access_token'];
+          d.refresh = new_tokens['refresh_token'];
         }
         return d;
       } else {
@@ -284,7 +263,7 @@ export class AuthLiteClient {
         return d;
       }
     } catch (error) {
-      throw new Error("Both tokens are invalid, please log in again");
+      throw new Error('Both tokens are invalid, please log in again');
     }
   }
 }
