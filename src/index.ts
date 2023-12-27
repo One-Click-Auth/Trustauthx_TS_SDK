@@ -1,27 +1,6 @@
 import { decodeJwt, JWTPayload, SignJWT } from 'jose';
 import { makeRequest } from './utils';
-
-interface TokenCheck {
-  access: string;
-  refresh: string;
-  state: boolean;
-}
-
-type GetUser = {
-  iss: string;
-  jti: string;
-  access_token: string;
-  type: string;
-  exp: number;
-  refresh_Token: string;
-  refreshExp: number;
-  scope: string;
-  img: string;
-  name: string;
-  iat: number;
-  uid: string;
-  email: string;
-};
+import { GetUser, TokenCheck } from './types';
 
 export class AuthLiteClient {
   private secretKey: string;
