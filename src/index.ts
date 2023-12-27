@@ -1,27 +1,55 @@
-import { decode, sign } from 'jsonwebtoken';
-
+import { decodeJwt, JWTPayload, SignJWT } from 'jose';
 import { makeRequest } from './utils';
-import { GetUser, TokenCheck } from './types';
+
+interface TokenCheck {
+  access: string;
+  refresh: string;
+  state: boolean;
+}
+
+type GetUser = {
+  iss: string;
+  jti: string;
+  access_token: string;
+  type: string;
+  exp: number;
+  refresh_Token: string;
+  refreshExp: number;
+  scope: string;
+  img: string;
+  name: string;
+  iat: number;
+  uid: string;
+  email: string;
+};
 
 export class AuthLiteClient {
   private secretKey: string;
   private apiKey: string;
-  private orgId?: string;
   private signedKey: string;
+  private data: JWTPayload;
+  private orgId?: string;
 
+  // TODO: use for build/options pattern for instaniating instance async
+  // TODO: add babel support for top-level-await to cjs
+  // TODO: replace (un)condition checks for signed-key with async instance constructor
   constructor(apiKey: string, secretKey: string, orgId?: string) {
     this.secretKey = secretKey;
     this.apiKey = apiKey;
     this.orgId = orgId;
-    this.signedKey = this.jwtEncode(secretKey, { api_key: this.apiKey });
+    this.signedKey = '';
+    this.data = { api_key: this.apiKey };
   }
 
-  private jwtEncode(key: string, data: object): string {
-    return sign(data, key, { algorithm: 'HS256', noTimestamp: true });
+  private async getEncodedJWT(): Promise<string> {
+    const secret = new TextEncoder().encode(this.secretKey);
+    return await new SignJWT(this.data)
+      .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
+      .sign(secret);
   }
 
-  private jwtDecode(token: string): any {
-    return decode(token);
+  private getDecodedJWT(token: string): Record<string, any> {
+    return decodeJwt(token);
   }
 
   generateUrl(subDomain?: string): string {
@@ -33,6 +61,9 @@ export class AuthLiteClient {
   }
 
   generateEditUserUrl(accessToken: string, url: string): string {
+    if (!this.signedKey) {
+      throw Error('JWT Token Not Available');
+    }
     const params = new URLSearchParams({
       AccessToken: accessToken,
       api_key: this.apiKey,
@@ -45,6 +76,9 @@ export class AuthLiteClient {
 
   async reAuth(code: string): Promise<{ email: string; uid: string }> {
     const url = 'https://api.trustauthx.com/api/user/me/widget/re-auth/token';
+    if (!this.signedKey) {
+      this.signedKey = await this.getEncodedJWT();
+    }
     const params = new URLSearchParams({
       code: code,
       api_key: this.apiKey,
@@ -60,7 +94,7 @@ export class AuthLiteClient {
       if (response.status === 200) {
         const data = await response.json();
 
-        const decoded = this.jwtDecode(JSON.stringify(data));
+        const decoded = this.getDecodedJWT(JSON.stringify(data));
 
         return { email: decoded.email, uid: decoded.uid };
       } else {
@@ -77,6 +111,11 @@ export class AuthLiteClient {
 
   async getUser(token: string): Promise<GetUser> {
     const url = 'https://api.trustauthx.com/api/user/me/auth/data';
+
+    if (!this.signedKey) {
+      this.signedKey = await this.getEncodedJWT();
+    }
+
     const params = new URLSearchParams({
       UserToken: token,
       api_key: this.apiKey,
@@ -93,7 +132,7 @@ export class AuthLiteClient {
       if (response.status === 200) {
         const data = await response.json();
 
-        const decoded = this.jwtDecode(data);
+        const decoded = this.getDecodedJWT(data);
         const decodedSub = JSON.parse(decoded['sub']);
         delete decoded['sub'];
 
@@ -112,6 +151,9 @@ export class AuthLiteClient {
 
   async getAccessTokenFromRefreshToken(refreshToken: string): Promise<any> {
     const url = 'https://api.trustauthx.com/api/user/me/access/token/';
+    if (!this.signedKey) {
+      this.signedKey = await this.getEncodedJWT();
+    }
     const params = new URLSearchParams({
       RefreshToken: refreshToken,
       api_key: this.apiKey,
@@ -141,6 +183,9 @@ export class AuthLiteClient {
 
   async validateAccessToken(access_token: string): Promise<boolean> {
     const url = 'https://api.trustauthx.com/api/user/me/auth/validate/token';
+    if (!this.signedKey) {
+      this.signedKey = await this.getEncodedJWT();
+    }
     const params = new URLSearchParams({
       AccessToken: access_token,
       api_key: this.apiKey,
@@ -167,6 +212,10 @@ export class AuthLiteClient {
   ): Promise<boolean> {
     const url = 'https://api.trustauthx.com/api/user/me/token/';
     const headers = { accept: 'application/json' };
+
+    if (!this.signedKey) {
+      this.signedKey = await this.getEncodedJWT();
+    }
 
     if (!accessToken)
       throw new Error('Must provide either AccessToken or RefreshToken');
@@ -199,6 +248,9 @@ export class AuthLiteClient {
     img: string;
   }> {
     const url = 'https://api.trustauthx.com/api/user/me/data';
+    if (!this.signedKey) {
+      this.signedKey = await this.getEncodedJWT();
+    }
     const params = new URLSearchParams({
       api_key: this.apiKey,
       signed_key: this.signedKey,
@@ -216,7 +268,7 @@ export class AuthLiteClient {
         const data = await response.text();
         const processedData = data.slice(1, -1);
 
-        const decoded = this.jwtDecode(processedData);
+        const decoded = this.getDecodedJWT(processedData);
 
         return {
           uid: decoded?.uid,

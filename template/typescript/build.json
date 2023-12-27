@@ -1,0 +1,10 @@
+{
+  "display": "Build",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "inlineSources": true,
+    "noEmit": false,
+    "sourceMap": true
+  }
+}
