@@ -1,0 +1,19 @@
+{
+  "display": "Default",
+  "compilerOptions": {
+    "lib": ["es2022", "dom"],
+    "esModuleInterop": true,
+    "target": "es2021",
+    "allowJs": false,
+    "module": "esnext",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "sourceMap": true,
+    "removeComments": true,
+    "verbatimModuleSyntax": false,
+    "moduleResolution": "node"
+  },
+  "exclude": ["**/*/node_modules"]
+}

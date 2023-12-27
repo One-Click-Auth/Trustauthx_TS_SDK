@@ -1,25 +1,51 @@
 {
   "name": "trustauthx",
-  "version": "1.0.37",
+  "version": "1.0.38",
   "description": "",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/types/index.d.ts",
+  "typings": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "src/**/*.ts"
+  ],
+  "imports": {
+    "#dist": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "#dist/*": {
+      "import": "./dist/esm/*.js",
+      "require": "./dist/cjs/*.js"
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
-    "build": "tsc src/index.ts --module commonjs --target esnext --declaration true --declarationMap true --outDir dist",
-    "build:types": "tsc src/index.ts --emitDeclarationOnly --declaration true --declarationMap true",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "tsc --project tsconfig.build.json --module commonjs --outDir ./dist/cjs --removeComments --verbatimModuleSyntax false && echo > ./dist/cjs/package.json '{\"type\":\"commonjs\"}'",
+    "build:esm": "tsc --project tsconfig.build.json --module es2015 --outDir ./dist/esm --removeComments && echo > ./dist/esm/package.json '{\"type\":\"module\"}'",
+    "build:types": "tsc --project tsconfig.build.json --module esnext --declarationDir ./dist/types --emitDeclarationOnly --declaration --declarationMap",
+    "clean": "rm -rf ./dist",
     "lint": "tsc",
-    "start": "tsc && nodemon dist/client.js"
+    "start": "tsc && nodemon dist/client.cjs"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.3",
+    "@types/node": "^20.10.5",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
-    "jsonwebtoken": "^9.0.2",
+    "jose": "^5.1.3",
     "nodemon": "^3.0.1"
   }
 }
