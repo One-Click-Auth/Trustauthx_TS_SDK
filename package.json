@@ -1,6 +1,6 @@
 {
   "name": "trustauthx",
-  "version": "1.0.38",
+  "version": "1.0.39",
   "description": "",
   "type": "module",
   "main": "./dist/cjs/index.js",
