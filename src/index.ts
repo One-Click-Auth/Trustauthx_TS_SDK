@@ -39,9 +39,9 @@ export class AuthLiteClient {
     else throw new Error('Must provide org_id');
   }
 
-  generateEditUserUrl(accessToken: string, url: string): string {
+  async generateEditUserUrl(accessToken: string, url: string): Promise<string> {
     if (!this.signedKey) {
-      throw Error('JWT Token Not Available');
+      this.signedKey = await this.getEncodedJWT();
     }
     const params = new URLSearchParams({
       AccessToken: accessToken,
@@ -80,7 +80,7 @@ export class AuthLiteClient {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`,
+          }\n${await response.text()}`
         );
       }
     } catch (error) {
@@ -120,7 +120,7 @@ export class AuthLiteClient {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`,
+          }\n${await response.text()}`
         );
       }
     } catch (error) {
@@ -152,7 +152,7 @@ export class AuthLiteClient {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`,
+          }\n${await response.text()}`
         );
       }
     } catch (error: any) {
@@ -187,7 +187,7 @@ export class AuthLiteClient {
   async revokeToken(
     accessToken: string,
     refreshToken: string | null = null,
-    revokeAllTokens: boolean = false,
+    revokeAllTokens: boolean = false
   ): Promise<boolean> {
     const url = 'https://api.trustauthx.com/api/user/me/token/';
     const headers = { accept: 'application/json' };
@@ -258,7 +258,7 @@ export class AuthLiteClient {
         throw new Error(
           `Request failed with status code: ${
             response.status
-          }\n${await response.text()}`,
+          }\n${await response.text()}`
         );
       }
     } catch (error) {
@@ -268,7 +268,7 @@ export class AuthLiteClient {
 
   async validateTokenSet(
     access_token: string,
-    refresh_token: string,
+    refresh_token: string
   ): Promise<TokenCheck> {
     try {
       const d: TokenCheck = {
@@ -280,7 +280,7 @@ export class AuthLiteClient {
       if (!is_valid) {
         if (refresh_token) {
           const new_tokens = await this.getAccessTokenFromRefreshToken(
-            refresh_token,
+            refresh_token
           );
           d.state = false;
           d.access = new_tokens['access_token'];
